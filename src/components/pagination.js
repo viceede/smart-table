@@ -12,6 +12,12 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
         let page = state.page;                                        // страница переменной, потому что она может меняться при обработке действий позже
 
         // @todo: #2.6 — обработать действия
+        if (action) switch(action.name) {
+            case 'prev' : page = Math.max(1, page - 1); break;
+            case 'next' : page = Math.min(pageCount, page + 1); break;
+            case 'first' : page = 1; break;
+            case 'last' : page = pageCount; break;
+        }
 
         // @todo: #2.4 — получить список видимых страниц и вывести их
         const visiblePages = getPages(page, pageCount, 5);                // Получим массив страниц, которые нужно показать, выводим только 5 страниц
@@ -21,6 +27,9 @@ export const initPagination = ({pages, fromRow, toRow, totalRows}, createPage) =
         }))
 
         // @todo: #2.5 — обновить статус пагинации
+        fromRow.textContent = (page - 1) * rowsPerPage + 1;                    // С какой строки выводим
+        toRow.textContent = Math.min((page * rowsPerPage), data.length);    // До какой строки выводим, если это последняя страница, то отображаем оставшееся количество
+        totalRows.textContent = data.length;                                // Сколько всего строк выводим на всех страницах вместе (после фильтрации будет меньше)
 
         // @todo: #2.2 — посчитать сколько строк нужно пропустить и получить срез данных
         const skip = (page - 1) * rowsPerPage;            // сколько строк нужно пропустить
