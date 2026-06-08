@@ -22,11 +22,16 @@ export function initFiltering(elements, indexes) {
     return (data, state, action) => {
         // @todo: #4.2 — обработать очистку поля
 
-        if (action && action.name === 'clear') {
-            let input = action.parentElement.querySelector('input');
-            input.value = '';
-            
-        }
+        if (action){
+            switch(action.name){
+                case 'clear':
+                    let input = action.parentElement.querySelector('input');
+                    input.value = '';
+                    let stateField = action.dataset.field;
+                    state[stateField] = '';
+                    break;
+                }
+        } 
 
 
         // @todo: #4.5 — отфильтровать данные используя компаратор
