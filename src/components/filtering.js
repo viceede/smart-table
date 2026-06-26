@@ -1,27 +1,23 @@
-import {createComparison, defaultRules} from "../lib/compare.js";
 
-// @todo: #4.3 — настроить компаратор
-const compare = createComparison(defaultRules);
 
 export function initFiltering(elements, indexes) {
     // @todo: #4.1 — заполнить выпадающие списки опциями
-    Object.keys(indexes)                                    // Получаем ключи из объекта
-        .forEach((elementName) => {                        // Перебираем по именам
-            elements[elementName].append(                    // в каждый элемент добавляем опции
-                ...Object.values(indexes[elementName])        // формируем массив имён, значений опций
-                        .map(name => {                        // используйте name как значение и текстовое содержимое
+    const updateIndexes = (elements, indexes) => {
+        Object.keys(indexes)
+        .forEach((elementName) => {
+            elements[elementName].append(
+                ...Object.values(indexes[elementName])
+                        .map(name => {
                             let optionTag = document.createElement('option');
                             optionTag.setAttribute('value', `${name}`);
                             optionTag.textContent = `${name}`;
 
                             return optionTag;
-                        })
-            )
+                        }))
         })
+    }
 
-    return (data, state, action) => {
-        // @todo: #4.2 — обработать очистку поля
-
+    const applyFiltering = (query, state, action) => {
         if (action){
             switch(action.name){
                 case 'clear':
@@ -31,16 +27,21 @@ export function initFiltering(elements, indexes) {
                     state[stateField] = '';
                     break;
                 }
-        } 
+        }
+        // @todo: #4.5 — отфильтровать данные, используя компаратор
+        const filter = {};
+        Object.keys(elements).forEach(key => {
+            if (elements[key]) {
+                if (['INPUT', 'SELECT'].includes(elements[key].tagName) && elements[key].value) { // ищем поля ввода в фильтре с непустыми данными
+                    filter[`filter[${elements[key].name}]`] = elements[key].value; // чтобы сформировать в query вложенный объект фильтра
+                }
+            }
+        })
+        return Object.keys(filter).length ? Object.assign({}, query, filter) : query; // если в фильтре что-то добавилось, применим к запросу
+    }
 
-
-        // @todo: #4.5 — отфильтровать данные используя компаратор
-        return data.filter(row => compare(row, {
-            ...state,
-            total: [
-                state.totalFrom ? Number(state.totalFrom) : undefined,
-                state.totalTo ? Number(state.totalTo) : undefined
-            ]
-        }));
+    return {
+        updateIndexes,
+        applyFiltering
     }
 }
