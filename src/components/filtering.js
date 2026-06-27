@@ -1,47 +1,48 @@
-
-
 export function initFiltering(elements, indexes) {
-    // @todo: #4.1 — заполнить выпадающие списки опциями
-    const updateIndexes = (elements, indexes) => {
-        Object.keys(indexes)
-        .forEach((elementName) => {
-            elements[elementName].append(
-                ...Object.values(indexes[elementName])
-                        .map(name => {
-                            let optionTag = document.createElement('option');
-                            optionTag.setAttribute('value', `${name}`);
-                            optionTag.textContent = `${name}`;
+	// @todo: #4.1 — заполнить выпадающие списки опциями
+	const updateIndexes = (elements, indexes) => {
+		Object.keys(indexes).forEach(elementName => {
+			elements[elementName].append(
+				...Object.values(indexes[elementName]).map(name => {
+					let optionTag = document.createElement('option')
+					optionTag.setAttribute('value', `${name}`)
+					optionTag.textContent = `${name}`
 
-                            return optionTag;
-                        }))
-        })
-    }
+					return optionTag
+				}),
+			)
+		})
+	}
 
-    const applyFiltering = (query, state, action) => {
-        if (action){
-            switch(action.name){
-                case 'clear':
-                    let input = action.parentElement.querySelector('input');
-                    input.value = '';
-                    let stateField = action.dataset.field;
-                    state[stateField] = '';
-                    break;
-                }
-        }
-        // @todo: #4.5 — отфильтровать данные, используя компаратор
-        const filter = {};
-        Object.keys(elements).forEach(key => {
-            if (elements[key]) {
-                if (['INPUT', 'SELECT'].includes(elements[key].tagName) && elements[key].value) { // ищем поля ввода в фильтре с непустыми данными
-                    filter[`filter[${elements[key].name}]`] = elements[key].value; // чтобы сформировать в query вложенный объект фильтра
-                }
-            }
-        })
-        return Object.keys(filter).length ? Object.assign({}, query, filter) : query; // если в фильтре что-то добавилось, применим к запросу
-    }
+	const applyFiltering = (query, state, action) => {
+		if (action) {
+			switch (action.name) {
+				case 'clear':
+					let input = action.parentElement.querySelector('input')
+					input.value = ''
+					let stateField = action.dataset.field
+					state[stateField] = ''
+					break
+			}
+		}
+		// @todo: #4.5 — отфильтровать данные, используя компаратор
+		const filter = {}
+		Object.keys(elements).forEach(key => {
+			if (elements[key]) {
+				if (
+					['INPUT', 'SELECT'].includes(elements[key].tagName) &&
+					elements[key].value
+				) {
+					// ищем поля ввода в фильтре с непустыми данными
+					filter[`filter[${elements[key].name}]`] = elements[key].value // чтобы сформировать в query вложенный объект фильтра
+				}
+			}
+		})
+		return Object.keys(filter).length ? Object.assign({}, query, filter) : query // если в фильтре что-то добавилось, применим к запросу
+	}
 
-    return {
-        updateIndexes,
-        applyFiltering
-    }
+	return {
+		updateIndexes,
+		applyFiltering,
+	}
 }
